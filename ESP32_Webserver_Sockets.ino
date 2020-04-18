@@ -42,64 +42,45 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
   if (type == WS_EVT_CONNECT) {
 
-    Serial.println("Websocket client connection received");
+//    Serial.println("Websocket client connection received");
 
   } else if (type == WS_EVT_DISCONNECT) {
-    Serial.println("Client disconnected");
+//    Serial.println("Client disconnected");
 
   } else if (type == WS_EVT_DATA) {
-    static int neoPixCtr;
-    // Check to see if it's a starting string 1-6
-    switch (colourRGB) {
-      case 0: BLU = data[0];
-        colourRGB++;
-        break;
+    /*
+      //DO NOT DELETE Test code to view the string coming over WEbsocket
+        Serial.print("len = ");
+        Serial.print(len);
 
-      case 1: GRN = data[0];
-        colourRGB++;
-        break;
+        for (int i=0; i < len; i ++ ) {
+          Serial.print(" i = ");
+          Serial.print(i);
+          Serial.print(" data = ");
+          Serial.println(data[i]);
+        }
+    */
+    for (int i = 0; i < NEO_NB; i++) {
+      //              int R = data[i*3 + 2];
+      //              int G = data[i*3 + 1];
+      //              int B = data[i*3 + 0];
 
-      case 2: RED = data[0];
-        colourRGB++;
+      strip.setPixelColor(i, (uint8_t) data[i * 3 + 2], (uint8_t) data[i * 3 + 1], (uint8_t) data[i * 3 + 0]);
+      //              Serial.print("Pixel: ");
+      //              Serial.print(i);
+      //              Serial.print("Len: ");
+      //              Serial.print(len);
+      //              Serial.print(" B: ");
+      //              Serial.print(B);
+      //              Serial.print(" G: ");
+      //              Serial.print(G);
+      //              Serial.print(" R: ");
+      //              Serial.println(R);
 
-        break;
     }
-
-    if (colourRGB == 3) {
-      ledcWrite(redLedChannel, RED);
-      ledcWrite(bluLedChannel, BLU);
-      ledcWrite(grnLedChannel, GRN);
-      //add the RGB values to the relevant neoPixel in the array
-      strip.setPixelColor(neoPixCtr, RED, GRN, BLU);
-
-
-      //      Serial.print("Blue: ");
-      //      Serial.println(BLU);
-      //      Serial.print("Green: ");
-      //      Serial.println(GRN);
-      //      Serial.print("Red: ");
-      //      Serial.println(RED);
-      colourRGB = 0;
-      neoPixCtr++;
-
-      //Display the frame and restart the counter
-      if (neoPixCtr >= NEO_NB) {
-        //        newFrame(strip.Color(RED, GRN, BLU)); // Display colour on neopixels
-        strip.show();
-        neoPixCtr = 0;
-      }
-      //
-      //    Serial.println("Data received: ");
-      //    for (int i = 0; i < len; i++) {
-      //      Serial.print((uint8_t)data[i]);
-      //
-      //      Serial.print(",");
-    }
+    strip.show();
   }
-  //
-  //    Serial.println();
 }
-
 
 void setup() {
 
@@ -111,10 +92,10 @@ void setup() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial.println("Connecting to WiFi..");
+//    Serial.println("Connecting to WiFi..");
   }
 
-  Serial.println("Connected to the WiFi network");
+//  Serial.println("Connected to the WiFi network");
   Serial.println(WiFi.localIP());
 
   ws.onEvent(onWsEvent);
@@ -132,7 +113,7 @@ void setup() {
 
   //Initialise Neopixels
   strip.begin();
-  strip.setBrightness(50);
+  strip.setBrightness(200);
   strip.show(); // Initialize all pixels to 'off'
   // configure LED PWM functionalitites
   ledcSetup(redLedChannel, freq, resolution);
