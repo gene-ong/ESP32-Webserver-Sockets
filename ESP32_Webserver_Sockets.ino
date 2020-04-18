@@ -6,6 +6,7 @@
 //MACROS
 #define WIFI_TYPE 1//0 = Local WiFi Websockets, 1 = Access Point Websockets
 #define DEVELOPMENT_LOCATION 1 //0=strathfield home, 1=your chemist shop Randwick
+#define SERIAL_PRINT 0 //0 = no serial printing, 1 = allow serial printing
 
 #define NEO_PIN 26
 #define NEO_NB 80
@@ -45,11 +46,13 @@ WebSocketServer webSocketServer;
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
 
   if (type == WS_EVT_CONNECT) {
-    //    Serial.println("Websocket client connection received");
-
+#if SERIAL_PRINT == 1
+    Serial.println("Websocket client connection received");
+#endif
   } else if (type == WS_EVT_DISCONNECT) {
-    //    Serial.println("Client disconnected");
-
+#if SERIAL_PRINT == 1
+    Serial.println("Client disconnected");
+#endif
   } else if (type == WS_EVT_DATA) {
     /*
       //DO NOT DELETE Test code to view the string coming over WEbsocket
@@ -69,7 +72,10 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       leds[i].blue = (uint8_t) data[i * 3 + 0];
     }
     FastLED.show();
+#if SERIAL_PRINT == 1
     Serial.println(millis());
+#endif
+
   }
 }
 #elif WIFI_TYPE == 1
@@ -77,9 +83,9 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
 
 void setup() {
-
+#if SERIAL_PRINT == 1
   Serial.begin(115200);
-
+#endif
   delay(1000);
 
 
@@ -88,20 +94,25 @@ void setup() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
+#if SERIAL_PRINT == 1
     Serial.println("Connecting to WiFi..");
-  }
+#endif
 
+  }
+#if SERIAL_PRINT == 1
   Serial.println("Connected to the WiFi network");
   Serial.println(WiFi.localIP());
-
+#endif
   ws.onEvent(onWsEvent);
   wifiserver.addHandler(&ws);
-
   wifiserver.begin();
 
 #elif WIFI_TYPE == 1
   WiFi.softAP(ssid, password);
+#if SERIAL_PRINT == 1
   Serial.println(WiFi.softAPIP());
+#endif
+
 
   wifiserver.begin();
 #endif
@@ -146,16 +157,19 @@ void loop() {
         }
         FastLED.show();
         //        }
+#if SERIAL_PRINT == 1
         Serial.println(millis());
+#endif
+
       }
 
       delay(10); // Delay needed for receiving the data correctly
     }
-
+#if SERIAL_PRINT == 1
     Serial.println("The client disconnected");
+#endif
     delay(100);
   }
-
   delay(100);
 #endif
 }
