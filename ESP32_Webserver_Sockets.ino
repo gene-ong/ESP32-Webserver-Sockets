@@ -4,9 +4,9 @@
 #include "FastLED.h"
 
 //MACROS
+#define DEVELOPMENT_LOCATION 0 //0=strathfield home, 1=your chemist shop Randwick
 #define WIFI_TYPE 1//0 = Local WiFi Websockets, 1 = Access Point Websockets
-#define DEVELOPMENT_LOCATION 1 //0=strathfield home, 1=your chemist shop Randwick
-#define SERIAL_PRINT 0 //0 = no serial printing, 1 = allow serial printing
+#define SERIAL_PRINT 1 //0 = no serial printing, 1 = allow serial printing
 
 #define NEO_PIN 26
 #define NEO_NB 80
@@ -96,6 +96,8 @@ void setup() {
     delay(1000);
 #if SERIAL_PRINT == 1
     Serial.println("Connecting to WiFi..");
+    Serial.println(ssid);
+    Serial.println(password);
 #endif
 
   }
