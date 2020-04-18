@@ -131,7 +131,7 @@ void setup() {
 
   //Initialise Neopixels
   FastLED.addLeds<NEOPIXEL, NEO_PIN>(leds, NEO_NB);  // GRB ordering is assumed
-
+  FastLED.setBrightness( 50 );
 }
 
 void loop() {
