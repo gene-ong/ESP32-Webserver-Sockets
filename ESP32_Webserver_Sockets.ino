@@ -6,7 +6,8 @@
 //MACROS
 #define DEVELOPMENT_LOCATION 0 //0=strathfield home, 1=your chemist shop Randwick
 #define WIFI_TYPE 1//0 = Local WiFi Websockets, 1 = Access Point Websockets
-#define SERIAL_PRINT 1 //0 = no serial printing, 1 = allow serial printing
+#define SERIAL_PRINT 1 //0 = disable ALL serial printing, 1 = enable serial printing
+#define SERIAL_PRINT_DEBUG 1 //0 = disable excessive serial printing, enable excessive serial Printing
 
 #define NEO_PIN 26
 #define NEO_NB 80
@@ -72,7 +73,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       leds[i].blue = (uint8_t) data[i * 3 + 0];
     }
     FastLED.show();
-#if SERIAL_PRINT == 1
+#if SERIAL_PRINT == 1 && SERIAL_PRINT_DEBUG == 1
     Serial.println(millis());
 #endif
 
@@ -159,7 +160,7 @@ void loop() {
         }
         FastLED.show();
         //        }
-#if SERIAL_PRINT == 1
+#if SERIAL_PRINT == 1 && SERIAL_PRINT_DEBUG == 1
         Serial.println(millis());
 #endif
 
