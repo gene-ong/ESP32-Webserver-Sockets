@@ -149,13 +149,13 @@ void loop() {
         Serial.println(millis());
       }
 
-//      delay(10); // Delay needed for receiving the data correctly
+      delay(10); // Delay needed for receiving the data correctly
     }
 
     Serial.println("The client disconnected");
-//    delay(100);
+    delay(100);
   }
 
-//  delay(100);
+  delay(100);
 #endif
 }
