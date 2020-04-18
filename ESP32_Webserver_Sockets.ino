@@ -30,14 +30,6 @@ AsyncWebServer wifiServer(80);
 AsyncWebSocket ws("/test");
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NEO_NB, NEO_PIN, NEO_GRB + NEO_KHZ800);
 
-// Fill the dots one after the other with a color
-void newFrame() {
-  for (uint16_t i = 0; i < NEO_NB; i++) {
-    strip.setPixelColor(i, strip.Color(neoPixelMatrix[i][0], neoPixelMatrix[i][1], neoPixelMatrix[i][2]));
-  }
-  strip.show();
-}
-
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
 
   if (type == WS_EVT_CONNECT) {
@@ -61,22 +53,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
         }
     */
     for (int i = 0; i < NEO_NB; i++) {
-      //              int R = data[i*3 + 2];
-      //              int G = data[i*3 + 1];
-      //              int B = data[i*3 + 0];
-
       strip.setPixelColor(i, (uint8_t) data[i * 3 + 2], (uint8_t) data[i * 3 + 1], (uint8_t) data[i * 3 + 0]);
-      //              Serial.print("Pixel: ");
-      //              Serial.print(i);
-      //              Serial.print("Len: ");
-      //              Serial.print(len);
-      //              Serial.print(" B: ");
-      //              Serial.print(B);
-      //              Serial.print(" G: ");
-      //              Serial.print(G);
-      //              Serial.print(" R: ");
-      //              Serial.println(R);
-
     }
     strip.show();
   }
@@ -84,7 +61,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
 void setup() {
 
-  Serial.begin(115200);
+//  Serial.begin(115200);
 
   delay(1000);
 
@@ -113,7 +90,7 @@ void setup() {
 
   //Initialise Neopixels
   strip.begin();
-  strip.setBrightness(200);
+  strip.setBrightness(255);
   strip.show(); // Initialize all pixels to 'off'
   // configure LED PWM functionalitites
   ledcSetup(redLedChannel, freq, resolution);
