@@ -1,6 +1,6 @@
 #include "WiFi.h"
 #include "ESPAsyncWebServer.h"
-#include "Adafruit_NeoPixel.h"
+#include "FastLED.h"
 
 #define NEO_PIN 26
 #define NEO_NB 80
@@ -13,31 +13,19 @@ const char* password = "2714thecrescent21352016";
 
 uint8_t neoPixelMatrix[NEO_NB][COL_NB] = {{0}};
 
-// setting PWM properties
-const int freq = 5000;
-const int redLedChannel = 0;
-const int bluLedChannel = 1;
-const int grnLedChannel = 2;
-const int resolution = 8;
 static int colourRGB = 0;
-uint8_t BLU;
-uint8_t GRN;
-uint8_t RED;
-
-
+CRGB leds[NEO_NB];
 
 AsyncWebServer wifiServer(80);
 AsyncWebSocket ws("/test");
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(NEO_NB, NEO_PIN, NEO_GRB + NEO_KHZ800);
 
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
 
   if (type == WS_EVT_CONNECT) {
-
-//    Serial.println("Websocket client connection received");
+    //    Serial.println("Websocket client connection received");
 
   } else if (type == WS_EVT_DISCONNECT) {
-//    Serial.println("Client disconnected");
+    //    Serial.println("Client disconnected");
 
   } else if (type == WS_EVT_DATA) {
     /*
@@ -53,15 +41,17 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
         }
     */
     for (int i = 0; i < NEO_NB; i++) {
-      strip.setPixelColor(i, (uint8_t) data[i * 3 + 2], (uint8_t) data[i * 3 + 1], (uint8_t) data[i * 3 + 0]);
+      leds[i].red = (uint8_t) data[i * 3 + 2];
+      leds[i].green = (uint8_t) data[i * 3 + 1];
+      leds[i].blue = (uint8_t) data[i * 3 + 0];
     }
-    strip.show();
+    FastLED.show();
   }
 }
 
 void setup() {
 
-//  Serial.begin(115200);
+    Serial.begin(115200);
 
   delay(1000);
 
@@ -69,10 +59,10 @@ void setup() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-//    Serial.println("Connecting to WiFi..");
+    //    Serial.println("Connecting to WiFi..");
   }
 
-//  Serial.println("Connected to the WiFi network");
+  //  Serial.println("Connected to the WiFi network");
   Serial.println(WiFi.localIP());
 
   ws.onEvent(onWsEvent);
@@ -89,19 +79,7 @@ void setup() {
   digitalWrite(GRN_LED, LOW);
 
   //Initialise Neopixels
-  strip.begin();
-  strip.setBrightness(255);
-  strip.show(); // Initialize all pixels to 'off'
-  // configure LED PWM functionalitites
-  ledcSetup(redLedChannel, freq, resolution);
-  ledcSetup(bluLedChannel, freq, resolution);
-  ledcSetup(grnLedChannel, freq, resolution);
-
-  // attach the channel to the GPIO to be controlled
-  ledcAttachPin(RED_LED, redLedChannel);
-  ledcAttachPin(BLU_LED, bluLedChannel);
-  ledcAttachPin(GRN_LED, grnLedChannel);
-
+  FastLED.addLeds<NEOPIXEL, NEO_PIN>(leds, NEO_NB);  // GRB ordering is assumed
 
 }
 
