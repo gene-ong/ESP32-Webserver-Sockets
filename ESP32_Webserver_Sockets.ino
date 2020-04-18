@@ -5,7 +5,7 @@
 
 //MACROS
 #define WIFI_TYPE 1//0 = Local WiFi Websockets, 1 = Access Point Websockets
-
+#define DEVELOPMENT_LOCATION 1 //0=strathfield home, 1=your chemist shop Randwick
 
 #define NEO_PIN 26
 #define NEO_NB 80
@@ -15,8 +15,13 @@
 #define COL_NB 3
 
 #if WIFI_TYPE == 0
+#if DEVELOPMENT_LOCATION == 0
 const char* ssid     = "TeamEuxnix2016DS";
 const char* password = "2714thecrescent21352016";
+#elif DEVELOPMENT_LOCATION == 1
+const char* ssid     = "Chemist_Shop";
+const char* password = "High_66_Randwick";
+#endif
 #elif WIFI_TYPE == 1
 const char *ssid = "MyESP32AP";
 const char *password = "testpassword";
@@ -64,6 +69,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       leds[i].blue = (uint8_t) data[i * 3 + 0];
     }
     FastLED.show();
+    Serial.println(millis());
   }
 }
 #elif WIFI_TYPE == 1
@@ -82,10 +88,10 @@ void setup() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    //    Serial.println("Connecting to WiFi..");
+    Serial.println("Connecting to WiFi..");
   }
 
-  //  Serial.println("Connected to the WiFi network");
+  Serial.println("Connected to the WiFi network");
   Serial.println(WiFi.localIP());
 
   ws.onEvent(onWsEvent);
@@ -117,27 +123,39 @@ void setup() {
 void loop() {
 #if WIFI_TYPE == 1
   WiFiClient client = wifiserver.available();
- 
+
   if (client.connected() && webSocketServer.handshake(client)) {
- 
-    String data;      
- 
+
+    String data;
+
     while (client.connected()) {
- 
+
       data = webSocketServer.getData();
- 
+
       if (data.length() > 0) {
-         Serial.println(data);
-//         webSocketServer.sendData(data);
+        //        Serial.println(data);
+        //        webSocketServer.sendData(data);
+        //        for (int i = 0; i < NEO_NB; i++) {
+        //          Serial.print((uint8_t)data[i]);
+        //          Serial.print(" ");
+
+        for (int i = 0; i < NEO_NB; i++) {
+          leds[i].red = (uint8_t) data[i * 3 + 2];
+          leds[i].green = (uint8_t) data[i * 3 + 1];
+          leds[i].blue = (uint8_t) data[i * 3 + 0];
+        }
+        FastLED.show();
+        //        }
+        Serial.println(millis());
       }
- 
-      delay(10); // Delay needed for receiving the data correctly
-   }
- 
-   Serial.println("The client disconnected");
-   delay(100);
+
+//      delay(10); // Delay needed for receiving the data correctly
+    }
+
+    Serial.println("The client disconnected");
+//    delay(100);
   }
- 
-  delay(100);
+
+//  delay(100);
 #endif
 }
