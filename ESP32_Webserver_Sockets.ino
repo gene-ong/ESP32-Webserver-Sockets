@@ -1,13 +1,17 @@
-#include "WiFi.h"
-#include "ESPAsyncWebServer.h"
-#include <WebSocketServer.h>
-#include "FastLED.h"
-
 //MACROS
 #define DEVELOPMENT_LOCATION 0 //0=strathfield home, 1=your chemist shop Randwick
-#define WIFI_TYPE 1//0 = Local WiFi Websockets, 1 = Access Point Websockets
+#define WIFI_TYPE 0//0 = Local WiFi Websockets, 1 = Access Point Websockets
 #define SERIAL_PRINT 1 //0 = disable ALL serial printing, 1 = enable serial printing
-#define SERIAL_PRINT_DEBUG 1 //0 = disable excessive serial printing, enable excessive serial Printing
+#define SERIAL_PRINT_DEBUG 0 //0 = disable excessive serial printing, enable excessive serial Printing
+
+#include "WiFi.h"
+#include "FastLED.h"
+#if WIFI_TYPE == 0
+#include "ESPAsyncWebServer.h"
+#endif
+#if WIFI_TYPE == 1
+#include <WebSocketServer.h>
+#endif
 
 #define NEO_PIN 26
 #define NEO_NB 80
@@ -33,6 +37,7 @@ uint8_t neoPixelMatrix[NEO_NB][COL_NB] = {{0}};
 
 static int colourRGB = 0;
 CRGB leds[NEO_NB];
+int timeOut = 0;
 
 #if WIFI_TYPE == 0
 AsyncWebServer wifiserver(80);
@@ -115,9 +120,6 @@ void setup() {
 #if SERIAL_PRINT == 1
   Serial.println(WiFi.softAPIP());
 #endif
-
-
-  wifiserver.begin();
 #endif
 
 
@@ -136,43 +138,68 @@ void setup() {
 
 void loop() {
 #if WIFI_TYPE == 1
-  WiFiClient client = wifiserver.available();
-
-  if (client.connected() && webSocketServer.handshake(client)) {
-
-    String data;
-
-    while (client.connected()) {
-
-      data = webSocketServer.getData();
-
-      if (data.length() > 0) {
-        //        Serial.println(data);
-        //        webSocketServer.sendData(data);
-        //        for (int i = 0; i < NEO_NB; i++) {
-        //          Serial.print((uint8_t)data[i]);
-        //          Serial.print(" ");
-
-        for (int i = 0; i < NEO_NB; i++) {
-          leds[i].red = (uint8_t) data[i * 3 + 2];
-          leds[i].green = (uint8_t) data[i * 3 + 1];
-          leds[i].blue = (uint8_t) data[i * 3 + 0];
-        }
-        FastLED.show();
-        //        }
-#if SERIAL_PRINT == 1 && SERIAL_PRINT_DEBUG == 1
-        Serial.println(millis());
+  wifiserver.begin();
+#if SERIAL_PRINT == 1
+  Serial.println("WebServer begin");
 #endif
+  timeOut = 0;
+  while (timeOut <= 1000) {
+    WiFiClient client = wifiserver.available();
 
+    if (client.connected() && webSocketServer.handshake(client)) {
+      timeOut = 0;
+      String data;
+
+      while ((client.connected()) && (timeOut <= 100)) {
+
+        data = webSocketServer.getData();
+
+        if (data.length() > 0) {
+#if SERIAL_PRINT == 1 && SERIAL_PRINT_DEBUG == 1
+          Serial.println(data.length());
+#endif
+          //        Serial.println(data);
+          //        webSocketServer.sendData(data);
+          //        for (int i = 0; i < NEO_NB; i++) {
+          //          Serial.print((uint8_t)data[i]);
+          //          Serial.print(" ");
+
+          for (int i = 0; i < NEO_NB; i++) {
+            leds[i].red = (uint8_t) data[i * 3 + 2];
+            leds[i].green = (uint8_t) data[i * 3 + 1];
+            leds[i].blue = (uint8_t) data[i * 3 + 0];
+          }
+          FastLED.show();
+          //        }
+#if SERIAL_PRINT == 1 && SERIAL_PRINT_DEBUG == 1
+          Serial.println(millis());
+#endif
+          timeOut = 0;
+        }
+        else
+        {
+#if SERIAL_PRINT == 1 && SERIAL_PRINT_DEBUG == 1
+          Serial.println("data.length <= 0");
+#endif
+          timeOut++;
+        }
+#if SERIAL_PRINT == 1
+
+#endif
+        delay(10); // Delay needed for receiving the data correctly
       }
-
-      delay(10); // Delay needed for receiving the data correctly
+#if SERIAL_PRINT == 1
+      Serial.println("The client disconnected");
+#endif
+      delay(100);
     }
 #if SERIAL_PRINT == 1
-    Serial.println("The client disconnected");
+    Serial.println("The client disconnected and the handshake with client is no good?");
+    Serial.println(timeOut);
 #endif
     delay(100);
+    timeOut++;
+
   }
-  delay(100);
 #endif
 }
