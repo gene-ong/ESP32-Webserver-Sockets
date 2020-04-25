@@ -1,8 +1,8 @@
 //MACROS
 #define DEVELOPMENT_LOCATION 0 //0=strathfield home,1=strathfield home 2, 2=your chemist shop Randwick
 #define WIFI_TYPE 1//0 = Local WiFi Websockets, 1 = Access Point Websockets
-#define SERIAL_PRINT 1 //0 = disable ALL serial printing, 1 = enable serial printing
-#define SERIAL_PRINT_DEBUG 1 //0 = disable excessive serial printing, enable excessive serial Printing
+#define SERIAL_PRINT 0 //0 = disable ALL serial printing, 1 = enable serial printing
+#define SERIAL_PRINT_DEBUG 0 //0 = disable excessive serial printing, enable excessive serial Printing
 
 #include "WiFi.h"
 #include "FastLED.h"
