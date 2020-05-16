@@ -1,25 +1,25 @@
 //MACROS
 #define SERIAL_PRINT 0 //0 = disable ALL serial printing, 1 = enable serial printing
 #define SERIAL_PRINT_DEBUG 0 //0 = disable excessive serial printing, enable excessive serial Printing
-#define LEDSTRING_NB 0 //0 = single LED string, otherwise value equals number of strings
+#define LEDSTRING_NB 8 //0 = single LED string, otherwise value equals number of strings
 
 #include "WiFi.h"
 #include "FastLED.h"
 #include <WebSocketServer.h>
 
 #if LEDSTRING_NB == 0
-#define NEO_PIN 26
+#define NEO_PIN 18
 #define NEO_NB 80
 #else
-#define NEO_STRING_NB 208//64 x 26 matrix, divided by 8 strings = 208
-#define NEO_PIN0 21
-#define NEO_PIN1 22
-#define NEO_PIN2 19
+#define NEO_STRING_NB 10//64 x 26 matrix, divided by 8 strings = 208
+#define NEO_PIN0 12
+#define NEO_PIN1 2
+#define NEO_PIN2 0
 #define NEO_PIN3 5
-#define NEO_PIN4 17
-#define NEO_PIN5 0
-#define NEO_PIN6 2
-#define NEO_PIN7 12
+#define NEO_PIN4 18
+#define NEO_PIN5 19
+#define NEO_PIN6 21
+#define NEO_PIN7 22
 #endif
 
 #define RED_LED 0
@@ -71,8 +71,7 @@ void setup() {
   FastLED.addLeds<NEOPIXEL, NEO_PIN5>(leds[5], NEO_STRING_NB);  // GRB ordering is assumed
   FastLED.addLeds<NEOPIXEL, NEO_PIN6>(leds[6], NEO_STRING_NB);  // GRB ordering is assumed
   FastLED.addLeds<NEOPIXEL, NEO_PIN7>(leds[7], NEO_STRING_NB);  // GRB ordering is assumed
-  FastLED.addLeds<NEOPIXEL, NEO_PIN1>(leds[0], NEO_STRING_NB);  // GRB ordering is assumed
-  FastLED.setBrightness( 50 );
+  FastLED.setBrightness( 255 );
 #endif
 
 
@@ -83,6 +82,15 @@ void setup() {
   leds[0].green = 0;
   leds[0].blue = 0;
   FastLED.show();
+#else
+for(int i=0; i<LEDSTRING_NB; i++)
+{
+  //Initialise a red LED to indicate we are connecting
+  leds[i][0].red = 255;
+  leds[i][0].green = 0;
+  leds[i][0].blue = 0;
+}
+  FastLED.show();
 #endif
 
   WiFi.softAP(ssid, password);
@@ -92,6 +100,15 @@ void setup() {
   leds[0].red = 0;
   leds[0].green = 0;
   leds[0].blue = 255;
+  FastLED.show();
+  #else
+for(int i=0; i<LEDSTRING_NB; i++)
+{
+  //Initialise a red LED to indicate we are connecting
+  leds[i][0].red = 0;
+  leds[i][0].green = 0;
+  leds[i][0].blue = 255;
+}
   FastLED.show();
 #endif
 
@@ -141,9 +158,9 @@ void loop() {
 #else
         for (int i = 0; i < LEDSTRING_NB; i++) {
           for (int x = 0; x < NEO_STRING_NB; x++) {
-            leds[i][x].red = (uint8_t) data[i * 3 + 2];
-            leds[i][x].green = (uint8_t) data[i * 3 + 1];
-            leds[i][x].blue = (uint8_t) data[i * 3 + 0];
+            leds[i][x].red = (uint8_t) data[(i*NEO_STRING_NB + x) * 3 + 2];
+            leds[i][x].green = (uint8_t) data[(i*NEO_STRING_NB + x) * 3 + 1];
+            leds[i][x].blue = (uint8_t) data[(i*NEO_STRING_NB + x) * 3 + 0];
           }
         }
 #endif
