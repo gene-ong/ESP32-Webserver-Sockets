@@ -11,7 +11,7 @@
 #define NEO_PIN 18
 #define NEO_NB 80
 #else
-#define NEO_STRING_NB 10//64 x 26 matrix, divided by 8 strings = 208
+#define NEO_STRING_NB 208//64 x 26 matrix, divided by 8 strings = 208
 #define NEO_PIN0 12
 #define NEO_PIN1 2
 #define NEO_PIN2 0
