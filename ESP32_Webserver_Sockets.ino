@@ -2,7 +2,7 @@
 #define SERIAL_PRINT 0 //0 = disable ALL serial printing, 1 = enable serial printing
 #define SERIAL_PRINT_DEBUG 0 //0 = disable excessive serial printing, enable excessive serial Printing
 #define LEDSTRING_NB 8 //0 = single LED string, otherwise value equals number of strings
-
+#define LED_BRIGHTNESS 254
 #include "WiFi.h"
 #include "FastLED.h"
 #include <WebSocketServer.h>
@@ -71,7 +71,7 @@ void setup() {
   FastLED.addLeds<NEOPIXEL, NEO_PIN5>(leds[5], NEO_STRING_NB);  // GRB ordering is assumed
   FastLED.addLeds<NEOPIXEL, NEO_PIN6>(leds[6], NEO_STRING_NB);  // GRB ordering is assumed
   FastLED.addLeds<NEOPIXEL, NEO_PIN7>(leds[7], NEO_STRING_NB);  // GRB ordering is assumed
-  FastLED.setBrightness( 255 );
+  FastLED.setBrightness(LED_BRIGHTNESS);
 #endif
 
 
